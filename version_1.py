@@ -79,7 +79,6 @@ class MineSweeper:
                 self.flag -= 1
             else:
                 return
-
         # cancel a flag.
         elif self.game_board[row][col] == 'P':
             self.game_board[row][col] = '.'
