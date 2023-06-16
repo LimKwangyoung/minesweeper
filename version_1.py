@@ -11,11 +11,11 @@ class MineSweeper:
         self.mine = LEVEL_SET[level][2]
         self.flag = LEVEL_SET[level][2]
 
-        # create an initial board of size (width * height).
+        # create initial boards of size (width * height).
         self.board = [[0] * self.width for _ in range(self.height)]
         self.game_board = [['.'] * self.width for _ in range(self.height)]
 
-        # condition for win.
+        # variable for win.
         self.no_mine = 0
 
     def set_mines(self) -> None:
@@ -28,34 +28,24 @@ class MineSweeper:
                 mine_cnt += 1
 
                 # increase the number around a mine.
-                if (row - 1) >= 0 and (col - 1) >= 0 and self.board[row - 1][col - 1] != '*':
-                    self.board[row - 1][col - 1] += 1
-                if (row - 1) >= 0 and self.board[row - 1][col] != '*':
-                    self.board[row - 1][col] += 1
-                if (row - 1) >= 0 and (col + 1) <= (self.width - 1) and self.board[row - 1][col + 1] != '*':
-                    self.board[row - 1][col + 1] += 1
-                if (col - 1) >= 0 and self.board[row][col - 1] != '*':
-                    self.board[row][col - 1] += 1
-                if (col + 1) <= (self.width - 1) and self.board[row][col + 1] != '*':
-                    self.board[row][col + 1] += 1
-                if (row + 1) <= (self.height - 1) and (col - 1) >= 0 and self.board[row + 1][col - 1] != '*':
-                    self.board[row + 1][col - 1] += 1
-                if (row + 1) <= (self.height - 1) and self.board[row + 1][col] != '*':
-                    self.board[row + 1][col] += 1
-                if (row + 1) <= (self.height - 1) and (col + 1) <= (self.width - 1) and self.board[row + 1][col + 1] != '*':
-                    self.board[row + 1][col + 1] += 1
+                directions = ((row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+                              (row, col - 1), (row, col + 1),
+                              (row + 1, col - 1), (row + 1, col), (row + 1, col + 1))
+                for row, col in directions:
+                    if (0 <= row <= self.height - 1) and (0 <= col <= self.width - 1) and self.board[row][col] != '*':
+                        self.board[row][col] += 1
 
-    def draw_board(self) -> tuple:
-        print('! 지뢰찾기 게임 !\n')
-
+    def graphic(self) -> tuple:
+        print('!!! 지뢰찾기 게임 !!!\n')
         print('   |  ' + '  '.join(str(i % 10) for i in range(1, self.width + 1)))
         print('------' + '--'.join('-' for _ in range(1, self.width + 1)))
+
         for row in range(self.height):
             print(f'{(row + 1) % 10}  |  ' + '  '.join(str(self.game_board[row][col]) for col in range(self.width)))
         print()
-
-        print(f'깃발: {self.flag}   칠한 개수: {self.no_mine}')
+        print(f'깃발: {self.flag}')
         coord = input('원하는 타일의 행과 열을 입력하시오. (깃발은 F): ').split()
+
         if len(coord) == 2:
             row, col = coord
             on_flag = None
@@ -74,30 +64,25 @@ class MineSweeper:
             # the number around mines is 0.
             self.game_board[r][c] = ' '
             self.no_mine += 1
-            if (r - 1) >= 0 and (c - 1) >= 0 and self.game_board[r - 1][c - 1] == '.':
-                expand_board(r - 1, c - 1)
-            if (r - 1) >= 0 and self.game_board[r - 1][c] == '.':
-                expand_board(r - 1, c)
-            if (r - 1) >= 0 and (c + 1) <= (self.width - 1) and self.game_board[r - 1][c + 1] == '.':
-                expand_board(r - 1, c + 1)
-            if (c - 1) >= 0 and self.game_board[r][c - 1] == '.':
-                expand_board(r, c - 1)
-            if (c + 1) <= (self.width - 1) and self.game_board[r][c + 1] == '.':
-                expand_board(r, c + 1)
-            if (r + 1) <= (self.height - 1) and (c - 1) >= 0 and self.game_board[r + 1][c - 1] == '.':
-                expand_board(r + 1, c - 1)
-            if (r + 1) <= (self.height - 1) and self.game_board[r + 1][c] == '.':
-                expand_board(r + 1, c)
-            if (r + 1) <= (self.height - 1) and (c + 1) <= (self.width - 1) and self.game_board[r + 1][c + 1] == '.':
-                expand_board(r + 1, c + 1)
+
+            directions = ((r - 1, c - 1), (r - 1, c), (r - 1, c + 1),
+                          (r, c - 1), (r, c + 1),
+                          (r + 1, c - 1), (r + 1, c), (r + 1, c + 1))
+            for r, c in directions:
+                if (0 <= r <= self.height - 1) and (0 <= c <= self.width - 1) and self.game_board[r][c] == '.':
+                    expand_board(r, c)
 
         # plant a flag.
         if on_flag:
-            if self.flag > 0 and self.game_board[row][col] == '.':
-                self.game_board[row][col] = 'F'
+            if on_flag in ('F', 'f') and self.flag > 0 and self.game_board[row][col] == '.':
+                self.game_board[row][col] = 'P'
                 self.flag -= 1
             else:
                 return
+        # cancel a flag.
+        elif self.game_board[row][col] == 'P':
+            self.game_board[row][col] = '.'
+            self.flag += 1
         # select a mine
         elif self.board[row][col] == '*':
             print('GAME OVER')
@@ -109,11 +94,10 @@ class MineSweeper:
     def play(self):
         self.set_mines()
         while True:
-
             if self.no_mine == self.width * self.height - self.mine:
                 print('WIN')
                 sys.exit()
-            row, col, flag = self.draw_board()
+            row, col, flag = self.graphic()
             self.find_mine(row, col, flag)
 
 
