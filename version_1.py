@@ -44,6 +44,7 @@ class MineSweeper:
             print(f'{(row + 1) % 10}  |  ' + '  '.join(str(self.game_board[row][col]) for col in range(self.width)))
         print()
         print(f'깃발: {self.flag}')
+        print()
         coord = input('원하는 타일의 행과 열을 입력하시오. (깃발은 F): ').split()
 
         if len(coord) == 2:
@@ -85,7 +86,7 @@ class MineSweeper:
             self.flag += 1
         # select a mine
         elif self.board[row][col] == '*':
-            print('GAME OVER')
+            print('!!! GAME OVER !!!')
             sys.exit()
         # not select a mine.
         elif self.game_board[row][col] == '.':
@@ -95,7 +96,7 @@ class MineSweeper:
         self.set_mines()
         while True:
             if self.no_mine == self.width * self.height - self.mine:
-                print('WIN')
+                print('!!! WIN !!!')
                 sys.exit()
             row, col, flag = self.graphic()
             self.find_mine(row, col, flag)
