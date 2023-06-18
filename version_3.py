@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import *
 
 ROOT_WIDTH, ROOT_HEIGHT = (600, 600)
@@ -11,7 +12,7 @@ root.geometry(f'{ROOT_WIDTH}x{ROOT_HEIGHT}')
 root.resizable(False, False)
 
 # main game frame.
-game_frame = Frame(root, width=int(ROOT_WIDTH * 0.8), height=int(ROOT_HEIGHT * 0.8), background='black')
+game_frame = Frame(root, width=int(ROOT_WIDTH * 0.8), height=int(ROOT_HEIGHT * 0.8))
 game_frame.pack(pady=30)
 
 
@@ -21,11 +22,19 @@ def say(event, r, c):
 
 # button
 # buttons = [[None] * width for _ in range(height)]
-for row in range(height):
-    for col in range(width):
-        btn = Button(game_frame, padx=2, pady=2)
-        btn.bind('<Button-1>', lambda event, r=row, c=col: say(event, r, c))
-        btn.grid(column=row, row=col)
+# for row in range(height):
+#     for col in range(width):
+btn_frame = tkinter.Frame(game_frame, background='black', width=100, height=100, padx=0, pady=0, relief='sunken', bd=1)
+btn_frame.pack_propagate(0)
+btn_frame.pack()
+btn_frame_1 = tkinter.Frame(game_frame, background='black', width=100, height=100)
+btn_frame_1.pack()
+btn = tkinter.Button(btn_frame)
+btn.pack(fill=tkinter.BOTH, expand=tkinter.YES)
+# btn.bind('<Button-1>', lambda event, r=0, c=0: say(event, r, c))
+
+# btn_2 = Button(game_frame)
+# btn_2.place(x=10 + 90, y=10, width=100, height=100)
 
         # buttons[row][col] = btn
 
