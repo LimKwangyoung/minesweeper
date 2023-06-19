@@ -101,6 +101,6 @@ class MineSweeper:
 
 
 if __name__ == '__main__':
-    print('! 지뢰찾기 게임 !\n')
+    print('!!! 지뢰찾기 게임 !!!\n')
     game = MineSweeper(input('난이도를 입력하시오. (초급, 중급, 고급): '))
     game.play()
