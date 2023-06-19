@@ -1,5 +1,4 @@
 import random
-import sys
 import tkinter
 from PIL import Image, ImageTk
 
@@ -10,8 +9,43 @@ Y_PADDING = 40
 LEVEL_SET = {'초급': (9, 9, 10), '중급': (16, 16, 40), '고급': (30, 16, 99)}  # (width, height, mine)
 
 
+class StartWindow:
+    def __init__(self, root: tkinter.Tk):
+        self.root = root
+        self.root.title('지뢰 찾기')
+        self.root.geometry('450x600')
+        self.root.resizable(False, False)
+
+        self.main_frame = tkinter.Frame(root)
+        self.main_frame.pack(pady=90)
+
+        self.level = str()
+
+    def apply_level(self, level: str) -> None:
+        self.level = level
+        # close a window
+        self.root.destroy()
+        self.root.quit()
+
+    def select_level(self) -> None:
+        label = tkinter.Label(self.main_frame, text='지뢰 찾기', font=('TkDefaultFont', 50))
+        label.pack()
+        # beginner
+        btn_1 = tkinter.Button(self.main_frame, text='초급', command=lambda: self.apply_level('초급'),
+                               font=('TkDefaultFont', 30), width=6)
+        btn_1.pack(pady=(90, 15))
+        # intermediate
+        btn_2 = tkinter.Button(self.main_frame, text='중급', command=lambda: self.apply_level('중급'),
+                               font=('TkDefaultFont', 30), width=6)
+        btn_2.pack(pady=15)
+        # advanced
+        btn_3 = tkinter.Button(self.main_frame, text='고급', command=lambda: self.apply_level('고급'),
+                               font=('TkDefaultFont', 30), width=6)
+        btn_3.pack(pady=15)
+
+
 class MineSweeper:
-    def __init__(self, level: str, root: tkinter.Tk):
+    def __init__(self, root: tkinter.Tk, level: str):
         self.width = LEVEL_SET[level][0]
         self.height = LEVEL_SET[level][1]
         self.mine = LEVEL_SET[level][2]
@@ -21,12 +55,12 @@ class MineSweeper:
         self.board = [[0] * self.width for _ in range(self.height)]
         self.game_board = [[''] * self.width for _ in range(self.height)]
 
-        # variable for win
+        # variable for game clear
         self.no_mine = 0
 
         # resize images
-        resized_flag_img = Image.open('./flag.png').resize((int(SQUARE_SIZE * 0.6), int(SQUARE_SIZE * 0.6)))
-        self.flag_img = ImageTk.PhotoImage(resized_flag_img)
+        flag_img = Image.open('./flag.png').resize((int(SQUARE_SIZE * 0.6), int(SQUARE_SIZE * 0.6)))
+        self.flag_img = ImageTk.PhotoImage(flag_img)
 
         # GUI
         self.root = root
@@ -41,8 +75,7 @@ class MineSweeper:
         self.main_frame.pack(padx=X_PADDING, pady=(Y_PADDING, 0))
 
         self.flag_frame = tkinter.Frame(self.root, relief=tkinter.SUNKEN, bd=2)
-        self.flag_frame.pack(side='left',
-                             padx=int(1.5 * X_PADDING + SQUARE_SIZE), pady=(int(Y_PADDING / 2), Y_PADDING))
+        self.flag_frame.pack(side=tkinter.LEFT, padx=int(self.ROOT_WIDTH * 0.1), pady=(0, Y_PADDING))
         self.flag_label_1 = tkinter.Label(self.flag_frame, image=self.flag_img)
         self.flag_label_1.pack(side=tkinter.LEFT)
         self.flag_label_2 = tkinter.Label(self.flag_frame, text=f'{self.flag}', font=('TkDefaultFont', 20), width=4)
@@ -67,6 +100,26 @@ class MineSweeper:
                 for row, col in directions:
                     if (0 <= row <= self.height - 1) and (0 <= col <= self.width - 1) and self.board[row][col] != '*':
                         self.board[row][col] += 1
+
+    def game_clear_over(self, mode: str) -> None:
+        def close_window(win: tkinter.Tk) -> None:
+            win.destroy()
+            win.quit()
+            self.root.destroy()
+            self.root.quit()
+
+        window = tkinter.Tk()
+        window.title('')
+        window.geometry('400x300')
+        window.resizable(False, False)
+
+        label = tkinter.Label(window, text=mode, font=('TkDefaultFont', 30))
+        label.pack(pady=45)
+        btn = tkinter.Button(window, text='게임 종료', font=('TkDefaultFont', 25), width=8,
+                             command=lambda: close_window(window))
+        btn.pack()
+
+        window.mainloop()
 
     def on_click(self, row: int, col: int, on_flag=False) -> None:
         def expand_board(r: int, c: int) -> None:
@@ -103,18 +156,16 @@ class MineSweeper:
             self.buttons[row][col]['image'] = None
             self.buttons[row][col]['state'] = tkinter.NORMAL
             self.flag_label_2['text'] = f'{self.flag}'
-        # select a mine
+        # game over
         elif self.board[row][col] == '*':
-            print('!!! GAME OVER !!!')
-            sys.exit()
+            self.game_clear_over('GAME OVER')
         # not select a mine
         elif self.game_board[row][col] == '':
             expand_board(row, col)
 
-        # win
+        # game clear
         if self.no_mine == self.width * self.height - self.mine:
-            print('!!! WIN !!!')
-            sys.exit()
+            self.game_clear_over('GAME CLEAR')
 
     def play(self) -> None:
         self.set_mines()
@@ -128,16 +179,20 @@ class MineSweeper:
                 btn_frame.grid(row=row, column=col)
                 # button
                 btn = tkinter.Button(btn_frame, text=f'{self.game_board[row][col]}')
-                # btn.bind('<Button-1>', lambda event, r=row, c=col: self.on_click(r, c))
-                btn.bind('<Button-1>', lambda event, r=row, c=col: self.on_click(r, c, on_flag=True))
+                btn.bind('<Button-1>', lambda event, r=row, c=col: self.on_click(r, c))
+                btn.bind('<Button-3>', lambda event, r=row, c=col: self.on_click(r, c, on_flag=True))
                 btn.pack(fill=tkinter.BOTH, expand=tkinter.YES)
 
                 self.buttons[row][col] = btn
 
 
 if __name__ == '__main__':
-    window = tkinter.Tk()
-    # game = MineSweeper(input('난이도를 입력하시오. (초급, 중급, 고급): '), window)
-    game = MineSweeper('초급', window)
+    start_window = tkinter.Tk()
+    start = StartWindow(start_window)
+    start.select_level()
+    start_window.mainloop()
+
+    game_window = tkinter.Tk()
+    game = MineSweeper(game_window, start.level)
     game.play()
-    window.mainloop()
+    game_window.mainloop()
