@@ -140,18 +140,19 @@ class MineSweeper:
                 if (0 <= r <= self.height - 1) and (0 <= c <= self.width - 1) and self.game_board[r][c] == '':
                     expand_board(r, c)
 
-        # plant a flag
-        if on_flag and self.flag > 0 and self.game_board[row][col] == '':
-            self.flag -= 1
-            self.game_board[row][col] = 'F'
-            self.buttons[row][col].configure(image=self.flag_img, state=tkinter.ACTIVE)
-            self.flag_label_2.configure(text=f'{self.flag}')
-        # cancel a flag
-        elif self.game_board[row][col] == 'F':
-            self.flag += 1
-            self.game_board[row][col] = ''
-            self.buttons[row][col].configure(image='', text='', state=tkinter.NORMAL)
-            self.flag_label_2.configure(text=f'{self.flag}')
+        if on_flag:
+            # plant a flag
+            if self.flag > 0 and self.game_board[row][col] == '':
+                self.flag -= 1
+                self.game_board[row][col] = 'F'
+                self.buttons[row][col].configure(image=self.flag_img, state=tkinter.ACTIVE)
+                self.flag_label_2.configure(text=f'{self.flag}')
+            # cancel a flag
+            elif self.game_board[row][col] == 'F':
+                self.flag += 1
+                self.game_board[row][col] = ''
+                self.buttons[row][col].configure(image='', text='', state=tkinter.NORMAL)
+                self.flag_label_2.configure(text=f'{self.flag}')
         # game over
         elif self.board[row][col] == '*':
             self.game_clear_over('GAME OVER')
@@ -176,7 +177,7 @@ class MineSweeper:
                 # button
                 btn = tkinter.Button(btn_frame, text=f'{self.game_board[row][col]}')
                 btn.bind('<Button-1>', lambda event, r=row, c=col: self.on_click(r, c))
-                btn.bind('<Button-3>', lambda event, r=row, c=col: self.on_click(r, c, on_flag=True))
+                btn.bind('<Button-2>', lambda event, r=row, c=col: self.on_click(r, c, on_flag=True))
                 btn.pack(fill=tkinter.BOTH, expand=tkinter.YES)
 
                 self.buttons[row][col] = btn
