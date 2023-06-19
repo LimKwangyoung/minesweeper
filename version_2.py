@@ -125,16 +125,14 @@ class MineSweeper:
         def expand_board(r: int, c: int) -> None:
             if self.board[r][c] != 0:
                 self.no_mine += 1
-                self.buttons[r][c]['text'] = self.game_board[r][c] = self.board[r][c]
-                self.buttons[r][c]['state'] = tkinter.DISABLED
+                self.game_board[r][c] = self.board[r][c]
+                self.buttons[r][c].configure(text=self.game_board[r][c])
                 return
 
             # the number around mines is 0
             self.no_mine += 1
             self.game_board[r][c] = '0'
-            self.buttons[r][c]['text'] = ''
-            self.buttons[r][c]['state'] = tkinter.DISABLED
-            self.flag_label_2['text'] = f'{self.flag}'
+            self.buttons[r][c].configure(text='', state=tkinter.DISABLED)
             directions = ((r - 1, c - 1), (r - 1, c), (r - 1, c + 1),
                           (r, c - 1), (r, c + 1),
                           (r + 1, c - 1), (r + 1, c), (r + 1, c + 1))
@@ -145,17 +143,15 @@ class MineSweeper:
         # plant a flag
         if on_flag and self.flag > 0 and self.game_board[row][col] == '':
             self.flag -= 1
-            self.game_board[row][col] = 'P'
-            self.buttons[row][col]['image'] = self.flag_img
-            self.buttons[row][col]['state'] = tkinter.ACTIVE
-            self.flag_label_2['text'] = f'{self.flag}'
+            self.game_board[row][col] = 'F'
+            self.buttons[row][col].configure(image=self.flag_img, state=tkinter.ACTIVE)
+            self.flag_label_2.configure(text=f'{self.flag}')
         # cancel a flag
-        elif self.game_board[row][col] == 'P':
+        elif self.game_board[row][col] == 'F':
             self.flag += 1
-            self.buttons[row][col]['text'] = self.game_board[row][col] = ''
-            self.buttons[row][col]['image'] = None
-            self.buttons[row][col]['state'] = tkinter.NORMAL
-            self.flag_label_2['text'] = f'{self.flag}'
+            self.game_board[row][col] = ''
+            self.buttons[row][col].configure(image='', text='', state=tkinter.NORMAL)
+            self.flag_label_2.configure(text=f'{self.flag}')
         # game over
         elif self.board[row][col] == '*':
             self.game_clear_over('GAME OVER')
