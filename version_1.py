@@ -1,7 +1,7 @@
 import random
 import sys
 
-LEVEL_SET = {'초급': (9, 9, 10), '중급': (16, 16, 40), '고급': (16, 30, 99)}  # (width, height, mine)
+LEVEL_SET = {'초급': (9, 9, 10), '중급': (16, 16, 40), '고급': (30, 16, 99)}  # (width, height, mine)
 
 
 class MineSweeper:
