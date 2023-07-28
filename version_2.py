@@ -84,7 +84,7 @@ class MineSweeper:
         # buttons list
         self.buttons = [[None] * self.width for _ in range(self.height)]
 
-    def set_mines(self) -> None:
+    def set_mines(self, show_mines=False) -> None:
         # set mines randomly
         mine_cnt = 0
         while mine_cnt < self.mine:
@@ -100,6 +100,10 @@ class MineSweeper:
                 for row, col in directions:
                     if (0 <= row <= self.height - 1) and (0 <= col <= self.width - 1) and self.board[row][col] != '*':
                         self.board[row][col] += 1
+
+        if show_mines:
+            for row in range(self.height):
+                print(' '.join(map(str, self.board[row])))
 
     def game_clear_over(self, mode: str) -> None:
         def close_window(win: tkinter.Tk) -> None:
